@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flor Centrada para Ti</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+        :root {
+            --bg-dark: #00040a;
+            --bg-navy: #001530;
+            --flower-yellow: #ffdf60;
+            --flower-glow: #fff1a0;
+            --petal-gradient: linear-gradient(135deg, #fffadb 0%, #ffc300 100%);
+            --heart-color: rgba(255, 100, 150, 0.7);
+            --text-pink: #ff85a1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centrado vertical completo */
+            align-items: center; /* Centrado horizontal completo */
+            background: radial-gradient(circle at center, var(--bg-navy) 0%, var(--bg-dark) 100%);
+            overflow: hidden;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* --- Lluvia de Corazones (sin cambios) --- */
+        #rain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: var(--heart-color);
+            transform: rotate(-45deg);
+            opacity: 0;
+        }
+
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: var(--heart-color);
+            border-radius: 50%;
+        }
+        .heart::before { top: -7.5px; left: 0; }
+        .heart::after { top: 0; left: 7.5px; }
+
+        /* --- Contenedor Principal (ajustado para centrado vertical) --- */
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Asegura centrado interno */
+            z-index: 10;
+            position: relative;
+            /* Eliminamos el margin-bottom anterior para que el centrado sea puro */
+        }
+
+        /* --- La Flor (12 Pétalos) (sin cambios) --- */
+        .flower-scene {
+            position: relative;
+            width: 380px;
+            height: 380px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 0 45px rgba(255, 220, 100, 0.6));
+            /* Un pequeño margen para separar la flor del texto al centrar */
+            margin-bottom: -50px; 
+        }
+
+        .flower-center {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #fff 0%, var(--flower-glow) 40%, #ff9e00 100%);
+            border-radius: 50%;
+            z-index: 20;
+            box-shadow: 0 0 40px #fff, 0 0 70px var(--flower-glow);
+        }
+
+        .petals-inner-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .petal {
+            position: absolute;
+            width: 80px;
+            height: 150px;
+            background: var(--petal-gradient);
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            transform-origin: bottom center;
+            /* Alineación ajustada para centrar los pétalos rotados */
+            left: 50%; 
+            bottom: 50%; 
+            /* El transform se aplicará con rotación y el offset necesario */
+            opacity: 0.95;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2), inset 0 0 15px rgba(255,255,255,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            filter: blur(1px); /* Añade suavidad general */
+        }
+
+        .petal.back {
+            filter: brightness(0.8) blur(1px);
+            height: 160px;
+            width: 85px;
+            z-index: 5;
+        }
+
+        /* --- El Texto --- */
+        .message {
+            color: var(--text-pink);
+            font-size: 3.5rem;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 133, 161, 0.6), 0 5px 0px #b33951;
+            user-select: none;
+            transition: transform 0.3s ease;
+            position: relative;
+            /* Pequeño ajuste para centrar el texto respecto a su línea de base */
+            top: 25px; 
+        }
+
+        .message:hover {
+            transform: scale(1.1);
+        }
+
+        .stem {
+            position: absolute;
+            top: 55%;
+            width: 6px;
+            height: 200px;
+            background: linear-gradient(to bottom, #004e92, transparent);
+            border-radius: 3px;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="rain-container"></div>
+
+    <div class="container">
+        <div class="flower-scene" id="flower">
+            <div class="stem"></div>
+            <div id="petals-container" class="petals-inner-container"></div>
+            <div class="flower-center"></div>
+        </div>
+        
+        <h1 class="message">te quiero mucho</h1>
+    </div>
+
+    <script>
+        /* --- Generar 12 Pétalos (ajustado para centrado) --- */
+        const petalsContainer = document.getElementById('petals-container');
+        for (let i = 0; i < 12; i++) {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            if (i % 2 === 0) petal.classList.add('back');
+            
+            const rotation = i * (360 / 12);
+            // El transform 'translate(-50%)' centra el pétalo antes de rotarlo
+            petal.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+            petalsContainer.appendChild(petal);
+        }
+
+        /* --- Animación Flor (sin cambios) --- */
+        const flower = document.getElementById('flower');
+        let tick = 0;
+
+        function animateFlower() {
+            tick += 0.02;
+            const scale = 1 + Math.sin(tick) * 0.03;
+            const brightness = 1 + Math.sin(tick) * 0.1;
+            
+            flower.style.transform = `scale(${scale})`;
+            flower.style.filter = `drop-shadow(0 0 ${45 * brightness}px rgba(255, 220, 100, 0.7))`;
+            requestAnimationFrame(animateFlower);
+        }
+
+        /* --- Lluvia de Corazones (sin cambios) --- */
+        const rainContainer = document.getElementById('rain-container');
+        const hearts = [];
+        const maxHearts = 35;
+
+        class Heart {
+            constructor() {
+                this.element = document.createElement('div');
+                this.element.classList.add('heart');
+                rainContainer.appendChild(this.element);
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * window.innerWidth;
+                this.y = -50;
+                this.vy = 1.5 + Math.random() * 2.5;
+                this.vx = Math.sin(Math.random() * 10) * 1;
+                this.scale = 0.4 + Math.random() * 0.8;
+                this.opacity = 0;
+            }
+
+            update() {
+                this.y += this.vy;
+                this.x += this.vx;
+                this.opacity = (this.y < 200) ? Math.min(this.opacity + 0.02, 0.6) : (this.y > window.innerHeight - 200 ? Math.max(this.opacity - 0.02, 0) : 0.6);
+                
+                this.element.style.transform = `translate(${this.x}px, ${this.y}px) rotate(-45deg) scale(${this.scale})`;
+                this.element.style.opacity = this.opacity;
+
+                if (this.y > window.innerHeight) this.reset();
+            }
+        }
+
+        for (let i = 0; i < maxHearts; i++) hearts.push(new Heart());
+
+        function animateRain() {
+            hearts.forEach(h => h.update());
+            requestAnimationFrame(animateRain);
+        }
+
+        animateFlower();
+        animateRain();
+    </script>
+</body>
+</html>

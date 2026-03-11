@@ -1,0 +1,89 @@
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+background: radial-gradient(circle at center,#0a1f4d,#020617);
+}
+
+/* escena */
+
+.escena{
+position:relative;
+width:500px;
+height:500px;
+}
+
+/* rama */
+
+.rama{
+position:absolute;
+width:6px;
+height:420px;
+background:#2d7a3e;
+left:250px;
+top:150px;
+transform:rotate(-40deg);
+border-radius:10px;
+}
+
+/* flor */
+
+.flor{
+position:absolute;
+width:90px;
+height:90px;
+}
+
+/* pétalos */
+
+.flor::before{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+border-radius:50%;
+background:
+radial-gradient(circle at 50% 10%,#ff9adf,#ff3da1);
+clip-path: polygon(
+50% 0%,65% 35%,100% 50%,65% 65%,50% 100%,35% 65%,0% 50%,35% 35%
+);
+}
+
+/* centro */
+
+.centro{
+position:absolute;
+width:18px;
+height:18px;
+background:#ffd43b;
+border-radius:50%;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+box-shadow:0 0 8px #ffeb8a;
+}
+
+/* posiciones */
+
+.f1{
+top:80px;
+left:210px;
+}
+
+.f2{
+top:160px;
+left:290px;
+}
+
+.f3{
+top:250px;
+left:190px;
+}
+
+.f4{
+top:330px;
+left:260px;
+}
